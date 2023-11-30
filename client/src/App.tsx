@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import { useState } from 'react';
-import Chat from './pages/Chat';
+import ChatPage from './pages/ChatPage';
 
 export type User = {
 	_id: string;
@@ -21,7 +21,7 @@ function App() {
 					{user._id === '' ? (
 						<Route path="/" element={<Login setUser={setUser} />} />
 					) : (
-						<Route path="/" element={<Chat />} />
+						<Route path="/" element={<ChatPage />} />
 					)}
 					<Route path="/signup" element={<Signup />} />
 				</Routes>
