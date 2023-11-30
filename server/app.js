@@ -1,52 +1,46 @@
 const express = require('express');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
 const cors = require('cors');
 const logger = require('morgan');
 const session = require('express-session');
 const passport = require('passport');
+const bcrypt = require('bcryptjs');
 const LocalStrategy = require('passport-local').Strategy;
+const mongoose = require('mongoose');
 
 require('dotenv').config();
 const DB_URL = process.env.DB_URL;
 const SESSION_SECRET = process.env.SESSION_SECRET;
 
-// DATA
-const users = [
-	{
-		id: 1,
-		username: 'rosa',
-		password: 'lina',
-	},
-	{
-		id: 2,
-		username: 'billy',
-		password: 'bob',
-	},
-];
+const mongoDb = process.env.DB_URL;
+mongoose.connect(mongoDb);
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'mongo connection error'));
 
-const app = express();
+const User = require('./models/user');
+
+const messages = [];
+
 const PORT = 3000;
+const app = express();
+const httpServer = createServer(app);
 
 passport.use(
 	new LocalStrategy(async (username, password, done) => {
-    let myUser;
-		let userExists = false;
-		let passwordMatches = false;
-		users.forEach((user) => {
-			if (user.username === username) {
-				userExists = true;
-				if (user.password === password) {
-					passwordMatches = true;
-          myUser = user;
-				}
+		try {
+			const user = await User.findOne({ username: username });
+			if (!user) {
+				return done(null, false, { message: 'incorrect username' });
 			}
-		});
-		if (!userExists) {
-			return done(null, false, { message: 'Incorrect username' });
+      const match = await bcrypt.compare(password, user.password);
+			if (!match) {
+				return done(null, false, { message: 'incorrect password' });
+			}
+			return done(null, user);
+		} catch (err) {
+			return done(err);
 		}
-		if (!passwordMatches) {
-			return done(null, false, { message: 'Incorrect password' });
-		}
-		return done(null, myUser);
 	})
 );
 
@@ -55,8 +49,12 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser(async (id, done) => {
-	const user = users.filter((user) => user.id === id);
-	done(null, user);
+	try {
+		const user = await User.findById(id);
+		done(null, user);
+	} catch (err) {
+		done(err);
+	}
 });
 
 app.use(cors());
@@ -67,38 +65,47 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
 
-app.get('/login', (req, res) => {
-  console.log(req.user);
-  res.json({user: req.user})
-})
-
-app.get('/login-failed', (req, res) => {
-  res.json('error logging in')
-})
-
-app.post('/signup', (req, res) => {
-	const username = req.body.username;
-	const password = req.body.password;
-	let usernameAlreadyExists = false;
-	users.forEach((user) => {
-		if (user.username === username) {
-			usernameAlreadyExists = true;
+// TODO: sanitize information
+app.post('/signup', async (req, res, next) => {
+	bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
+		// TODO: handle error
+		try {
+			const user = new User({
+				username: req.body.username,
+				password: hashedPassword,
+			});
+			const result = await user.save();
+			res.sendStatus(200);
+		} catch (err) {
+			return next(err);
 		}
 	});
-	if (usernameAlreadyExists) {
-		return res.json({ error: 'username already exists' });
-	}
-	users.push({ username, password });
-	return res.json(users);
 });
 
-app.post(
-	'/login',
-	passport.authenticate('local'), (req, res) => {
-    if (req.user) {
-      return res.json(req.user)
-    }
-    return res.json('error logging in')
-  });
+app.post('/login', passport.authenticate('local'), (req, res) => {
+	if (req.user) {
+    // TODO: find a better way to do this
+    const clientUser = {_id: req.user._id, username: req.user.username, isOnline: req.user.isOnline, friends: req.user.friends}
+		return res.json(clientUser);
+	}
+	return res.json('error logging in');
+});
 
-app.listen(PORT, () => console.log('server listening on http:localhost/3000'));
+const io = new Server(httpServer, {
+	cors: {
+		origin: '*',
+	},
+});
+
+io.on('connection', (socket) => {
+	socket.emit('greeting', 'hello client');
+	socket.emit('messages', messages);
+
+	socket.on('new-message', (data) => {
+		messages.push(data);
+		console.log(messages);
+		io.emit('new-message', data);
+	});
+});
+
+httpServer.listen(PORT, () => console.log('server listening on http:localhost/3000'));
