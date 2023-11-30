@@ -1,6 +1,11 @@
-import tempAvatar from '../assets/Luffy-pic.png'
+import { User } from '../App';
+import tempAvatar from '../assets/Luffy-pic.png';
 
-function SidebarChat() {
+type Props = {
+	myUser: User;
+};
+
+function SidebarChat({ myUser }: Props) {
 	return (
 		<div className="h-full border-r border-base-content flex flex-col w-80 gap-2">
 			<div className="flex items-center justify-between px-4 pt-4 pb-2">

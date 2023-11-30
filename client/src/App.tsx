@@ -21,7 +21,7 @@ function App() {
 					{user._id === '' ? (
 						<Route path="/" element={<Login setUser={setUser} />} />
 					) : (
-						<Route path="/" element={<ChatPage />} />
+						<Route path="/" element={<ChatPage myUser={user} />} />
 					)}
 					<Route path="/signup" element={<Signup />} />
 				</Routes>

@@ -1,21 +1,27 @@
-function Menu() {
+import { User } from "../App";
+
+type Props = {
+  myUser: User;
+}
+
+function Menu({myUser}: Props) {
 	return (
-		<ul className="h-full border-r border-base-content flex flex-col justify-between p-2">
-			<div className="flex flex-col gap-2">
+		<ul className="h-full border-r border-base-content menu menu-vertical p-2">
+			<div className="flex flex-col gap-2 flex-1">
 				<li className="tooltip tooltip-right" data-tip="Chat">
-					<button className="btn">C</button>
+					<a>C</a>
 				</li>
 				<li className="tooltip tooltip-right" data-tip="Friends">
-					<button className="btn">F</button>
+					<a>F</a>
 				</li>
 			</div>
 
 			<div className="flex flex-col gap-2">
 				<li className="tooltip tooltip-right" data-tip="Profile">
-					<button className="btn">P</button>
+					<a>{user.username[0]}</a>
 				</li>
 				<li className="tooltip tooltip-right" data-tip="Expand">
-					<button className="btn">E</button>
+					<a>E</a>
 				</li>
 			</div>
 		</ul>
