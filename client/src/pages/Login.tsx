@@ -28,22 +28,27 @@ function Login({setUser}: Props) {
 			console.log(err);
 		}
   }
+
   return (
-    <>
-      <h1>Login</h1>
-      <form className="flex flex-col max-w-sm" onSubmit={onSubmit}>
-        <label htmlFor="username">Username</label>
-        <input className="border border-black" type="text" id="username" name="username" value={username} onChange={(e) => setUsername(e.target.value)} />
+    <div className="max-w-md mx-auto p-8 flex flex-col gap-4">
+      <h1 className="text-2xl">Login</h1>
+      <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+        <div className="flex flex-col">
+          <label htmlFor="username">Username</label>
+          <input className="input input-bordered" type="text" id="username" name="username" value={username} onChange={(e) => setUsername(e.target.value)} />
+        </div>
         
-        <label htmlFor="password">Password</label>
-        <input className="border border-black" type="password" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <div className="flex flex-col">
+          <label htmlFor="password">Password</label>
+          <input className="input input-bordered" type="password" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        </div>
 
         <div>
-          <button type="submit">Submit</button>
+          <button className="btn btn-outline" type="submit">Submit</button>
         </div>
       </form>
-      <p>Not registered? <Link to={'/signup'}>Sign up</Link></p>
-    </>
+      <p>Not registered? <Link className="link link-info" to={'/signup'}>Sign up</Link></p>
+    </div>
   )
 }
 

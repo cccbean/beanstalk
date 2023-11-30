@@ -40,7 +40,7 @@ function Chat() {
 			</ul>
 			<form onSubmit={sendMessage}>
 				<input
-					className="border border-black"
+					className="input input-bordered"
 					type="text"
 					id="message"
 					name="message"
