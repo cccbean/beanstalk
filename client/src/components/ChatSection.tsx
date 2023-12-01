@@ -25,7 +25,7 @@ function ChatSection({myUser, socket, currentChat, messages}: Props) {
   }
 
 	return (
-		<div className="flex-1 h-full flex flex-col">
+		<div className="flex-1 h-full flex flex-col overflow-hidden">
 			<div className="navbar justify-between border-b border-base-content">
 				<div>
 					<a className="btn btn-ghost">
@@ -38,7 +38,7 @@ function ChatSection({myUser, socket, currentChat, messages}: Props) {
 				</div>
 			</div>
 
-			<div className="flex-1 p-4">
+			<div className="flex-1 p-4 overflow-auto">
         {messages.map((message) => {
           if (message.user.username === myUser.username) {
             return <ChatBubble key={message._id} username={message.user.username} message={message.message} timestamp={message.createdAt} orientation="chat-end"  />
