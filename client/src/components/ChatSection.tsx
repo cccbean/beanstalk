@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { User } from '../App';
 import ChatBubble from '../components/ChatBubble';
 import { Chat, Message } from '../pages/ChatPage';
@@ -13,6 +13,11 @@ type Props = {
 
 function ChatSection({myUser, socket, currentChat, messages}: Props) {
   const [newMessage, setNewMessage] = useState('');
+	const scrollDivRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+		scrollDivRef.current?.scrollIntoView({ block: 'end' });
+	}, [messages]);
 
   const sendMessage:React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -46,6 +51,7 @@ function ChatSection({myUser, socket, currentChat, messages}: Props) {
             return <ChatBubble key={message._id} username={message.user.username} message={message.message} timestamp={message.createdAt} orientation="chat-start"  />
           }
         })}
+        <div ref={scrollDivRef}></div>
 			</div>
 
 			<form className="flex gap-4 p-4 border-t border-base-content" onSubmit={sendMessage}>
