@@ -31,7 +31,7 @@ function ChatPage({ myUser }: Props) {
 	useEffect(() => {
 		function onGetChatsEvent(data: Chat[]) {
 			setChats(data);
-      console.log(data);
+			console.log(data);
 		}
 
 		function onGetMessagesEvent(data: Message[]) {
@@ -39,13 +39,20 @@ function ChatPage({ myUser }: Props) {
 			console.log(data);
 		}
 
+		function onSendMessageEvent(data: Message) {
+      console.log(data);
+			setMessages((previous) => [...previous, data]);
+		}
+
 		socket.emit('get-chats', myUser);
 		socket.on('get-chats', onGetChatsEvent);
 		socket.on('get-messages', onGetMessagesEvent);
+		socket.on('send-message', onSendMessageEvent);
 
 		return () => {
 			socket.off('get-chats', onGetChatsEvent);
 			socket.off('get-messages', onGetMessagesEvent);
+			socket.off('send-message', onSendMessageEvent);
 		};
 	}, []);
 
@@ -53,7 +60,14 @@ function ChatPage({ myUser }: Props) {
 		<div className="h-screen flex">
 			<Menu myUser={myUser} />
 			<SidebarChat myUser={myUser} socket={socket} chats={chats} setCurrentChat={setCurrentChat} />
-			{currentChat._id !== '' && <ChatSection myUser={myUser} currentChat={currentChat} messages={messages} />}
+			{currentChat._id !== '' && (
+				<ChatSection
+					myUser={myUser}
+					socket={socket}
+					currentChat={currentChat}
+					messages={messages}
+				/>
+			)}
 		</div>
 	);
 }

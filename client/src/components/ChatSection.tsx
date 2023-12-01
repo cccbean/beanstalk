@@ -1,14 +1,29 @@
+import { useState } from 'react';
 import { User } from '../App';
 import ChatBubble from '../components/ChatBubble';
 import { Chat, Message } from '../pages/ChatPage';
+import { Socket } from 'socket.io-client';
 
 type Props = {
   myUser: User;
+  socket: Socket;
   currentChat: Chat;
   messages: Message[];
 }
 
-function ChatSection({myUser, currentChat, messages}: Props) {
+function ChatSection({myUser, socket, currentChat, messages}: Props) {
+  const [newMessage, setNewMessage] = useState('');
+
+  const sendMessage:React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+    socket.emit('send-message', {
+      user: myUser,
+      chat: currentChat._id,
+      message: newMessage
+    });
+    setNewMessage('');
+  }
+
 	return (
 		<div className="flex-1 h-full flex flex-col">
 			<div className="navbar justify-between border-b border-base-content">
@@ -33,9 +48,9 @@ function ChatSection({myUser, currentChat, messages}: Props) {
         })}
 			</div>
 
-			<form className="flex gap-4 p-4 border-t border-base-content">
+			<form className="flex gap-4 p-4 border-t border-base-content" onSubmit={sendMessage}>
 				<button className="btn">+</button>
-				<input className="input input-bordered flex-1" type="text" id="message" name="message" />
+				<input className="input input-bordered flex-1" type="text" id="message" name="message" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} />
 				<button className="btn">Send</button>
 			</form>
 		</div>

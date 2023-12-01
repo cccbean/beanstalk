@@ -115,6 +115,17 @@ io.on('connection', (socket) => {
 		// socket.emit('get-messages', messages);
 		io.emit('get-messages', messages);
 	});
+
+	socket.on('send-message', async (data) => {
+		const message = new Message({
+			user: data.user._id,
+			chat: data.chat,
+			message: data.message
+		})
+		const newMessage = await message.save();
+		const messageWithTimestamp = await Message.findById(newMessage._id).populate('user', '-password').exec();
+		io.emit('send-message', messageWithTimestamp);
+	})
 });
 
 httpServer.listen(PORT, () => console.log('server listening on http:localhost/3000'));
