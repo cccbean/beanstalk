@@ -109,7 +109,7 @@ io.on('connection', (socket) => {
 	});
 
 	socket.on('get-messages', async (data) => {
-		const messages = await Message.find({ chat: data }).populate('user', '-password').exec();
+		const messages = await Message.find({ chat: data }).populate('user', '-password').sort({timestamp: 1}).exec();
 		console.log(messages);
 		// for whatever reason, this isn't working
 		// socket.emit('get-messages', messages);

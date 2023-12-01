@@ -13,11 +13,6 @@ type Props = {
 
 function ChatSection({myUser, socket, currentChat, messages}: Props) {
   const [newMessage, setNewMessage] = useState('');
-	const scrollDivRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-		scrollDivRef.current?.scrollIntoView({ block: 'end' });
-	}, [messages]);
 
   const sendMessage:React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -30,7 +25,7 @@ function ChatSection({myUser, socket, currentChat, messages}: Props) {
   }
 
 	return (
-		<div className="flex-1 h-full flex flex-col overflow-hidden">
+		<div className="flex-1 h-full flex flex-col overflow-hidden relative">
 			<div className="navbar justify-between border-b border-base-content">
 				<div>
 					<a className="btn btn-ghost">
@@ -43,7 +38,7 @@ function ChatSection({myUser, socket, currentChat, messages}: Props) {
 				</div>
 			</div>
 
-			<div className="flex-1 p-4 overflow-auto">
+			<div className="flex-1 p-4 overflow-auto relative flex flex-col-reverse">
         {messages.map((message) => {
           if (message.user.username === myUser.username) {
             return <ChatBubble key={message._id} username={message.user.username} message={message.message} timestamp={message.createdAt} orientation="chat-end"  />
@@ -51,7 +46,6 @@ function ChatSection({myUser, socket, currentChat, messages}: Props) {
             return <ChatBubble key={message._id} username={message.user.username} message={message.message} timestamp={message.createdAt} orientation="chat-start"  />
           }
         })}
-        <div ref={scrollDivRef}></div>
 			</div>
 
 			<form className="flex gap-4 p-4 border-t border-base-content" onSubmit={sendMessage}>

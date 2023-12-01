@@ -31,17 +31,14 @@ function ChatPage({ myUser }: Props) {
 	useEffect(() => {
 		function onGetChatsEvent(data: Chat[]) {
 			setChats(data);
-			console.log(data);
 		}
 
 		function onGetMessagesEvent(data: Message[]) {
-			setMessages(data);
-			console.log(data);
+			setMessages(data.reverse());
 		}
 
 		function onSendMessageEvent(data: Message) {
-      console.log(data);
-			setMessages((previous) => [...previous, data]);
+			setMessages((previous) => [data, ...previous]);
 		}
 
 		socket.emit('get-chats', myUser);
