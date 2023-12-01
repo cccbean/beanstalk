@@ -18,7 +18,7 @@ function Menu({myUser}: Props) {
 
 			<div className="flex flex-col gap-2">
 				<li className="tooltip tooltip-right" data-tip="Profile">
-					<a>{user.username[0]}</a>
+					<a>{myUser.username[0]}</a>
 				</li>
 				<li className="tooltip tooltip-right" data-tip="Expand">
 					<a>E</a>

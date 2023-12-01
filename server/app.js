@@ -19,6 +19,27 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'mongo connection error'));
 
 const User = require('./models/user');
+const Chat = require('./models/chat');
+const Message = require('./models/message');
+
+// async function testChats() {
+// 	const rosa = await User.find({ username: 'rosa' }).exec();
+// 	const billy = await User.find({ username: 'billy' }).exec();
+// 	const fulano = await User.find({ username: 'fulano' }).exec();
+// 	const chat = new Chat({
+// 		name: 'rosa,billy',
+// 		users: [...rosa, ...billy],
+// 	});
+// 	const chat2 = new Chat({
+// 		name: 'rosa,fulano',
+// 		users: [...rosa, ...fulano],
+// 	});
+// 	console.log(chat);
+// 	console.log(chat2);
+//   await chat.save();
+//   await chat2.save();
+// }
+// // testChats();
 
 const messages = [];
 
@@ -33,7 +54,7 @@ passport.use(
 			if (!user) {
 				return done(null, false, { message: 'incorrect username' });
 			}
-      const match = await bcrypt.compare(password, user.password);
+			const match = await bcrypt.compare(password, user.password);
 			if (!match) {
 				return done(null, false, { message: 'incorrect password' });
 			}
@@ -84,8 +105,13 @@ app.post('/signup', async (req, res, next) => {
 
 app.post('/login', passport.authenticate('local'), (req, res) => {
 	if (req.user) {
-    // TODO: find a better way to do this
-    const clientUser = {_id: req.user._id, username: req.user.username, isOnline: req.user.isOnline, friends: req.user.friends}
+		// TODO: find a better way to do this
+		const clientUser = {
+			_id: req.user._id,
+			username: req.user.username,
+			isOnline: req.user.isOnline,
+			friends: req.user.friends,
+		};
 		return res.json(clientUser);
 	}
 	return res.json('error logging in');
@@ -98,7 +124,15 @@ const io = new Server(httpServer, {
 });
 
 io.on('connection', (socket) => {
+  // socket.emit('messages', )
 	socket.emit('messages', messages);
+
+  socket.on('get-chats', async (data) => {
+    console.log(data);
+    const chats = await Chat.find({users: data._id}).populate('users', '-password').exec();
+    console.log(chats);
+    socket.emit('get-chats', chats);
+  })
 
 	socket.on('new-message', (data) => {
 		messages.push(data);
