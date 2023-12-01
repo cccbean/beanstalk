@@ -1,13 +1,16 @@
+import { Socket } from 'socket.io-client';
 import { User } from '../App';
 import tempAvatar from '../assets/Luffy-pic.png';
 import { Chat } from '../pages/ChatPage';
 
 type Props = {
 	myUser: User;
+  socket: Socket;
 	chats: Chat[];
+  setCurrentChat: React.Dispatch<React.SetStateAction<Chat>>;
 };
 
-function SidebarChat({ myUser, chats }: Props) {
+function SidebarChat({ myUser, socket, chats, setCurrentChat }: Props) {
 	return (
 		<div className="h-full border-r border-base-content flex flex-col w-80 gap-2">
 			<div className="flex items-center justify-between px-4 pt-4 pb-2">
@@ -30,8 +33,11 @@ function SidebarChat({ myUser, chats }: Props) {
           const [otherUser] = chat.users.filter((user) => user.username !== myUser.username);
 
 					return (
-						<li key={chat._id}>
-							<a className="flex gap-4 rounded-none" href="">
+						<li key={chat._id} onClick={() => {
+              socket.emit('get-messages', chat._id);
+              setCurrentChat(chat)
+              }}>
+							<a className="flex gap-4 rounded-none">
 								<div className="avatar">
 									<div className="w-12 rounded-full">
 										<img src={tempAvatar} alt="" />

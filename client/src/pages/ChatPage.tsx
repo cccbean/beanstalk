@@ -6,39 +6,54 @@ import SidebarChat from '../components/SidebarChat';
 import { useEffect, useState } from 'react';
 
 export type Chat = {
-  _id: string;
-  name: string;
-  users: User[];
-}
+	_id: string;
+	name: string;
+	users: User[];
+};
+
+export type Message = {
+	_id: string;
+	user: User;
+	message: string;
+	createdAt: string;
+};
 
 type Props = {
-  myUser: User;
-}
+	myUser: User;
+};
 
-function ChatPage({myUser}: Props) {
-  const [chats, setChats] = useState<Chat[]>([]);
-  const [messages, setMessages] = useState<string[]>([]);
-	const [newMessage, setNewMessage] = useState('');
+function ChatPage({ myUser }: Props) {
+	const [chats, setChats] = useState<Chat[]>([]);
+	const [currentChat, setCurrentChat] = useState<Chat>({ _id: '', name: '', users: [] });
+	const [messages, setMessages] = useState<Message[]>([]);
 	const socket = io('http://localhost:3000');
 
-  useEffect(() => {
-    function onGetChatsEvent(data: Chat[]) {
-      setChats(data);
-    } 
+	useEffect(() => {
+		function onGetChatsEvent(data: Chat[]) {
+			setChats(data);
+      console.log(data);
+		}
 
-    socket.emit('get-chats', myUser);
-    socket.on('get-chats', onGetChatsEvent);
+		function onGetMessagesEvent(data: Message[]) {
+			setMessages(data);
+			console.log(data);
+		}
+
+		socket.emit('get-chats', myUser);
+		socket.on('get-chats', onGetChatsEvent);
+		socket.on('get-messages', onGetMessagesEvent);
 
 		return () => {
-      socket.off('get-chats', onGetChatsEvent);
+			socket.off('get-chats', onGetChatsEvent);
+			socket.off('get-messages', onGetMessagesEvent);
 		};
 	}, []);
 
 	return (
 		<div className="h-screen flex">
 			<Menu myUser={myUser} />
-			<SidebarChat myUser={myUser} chats={chats} />
-      <ChatSection myUser={myUser} />
+			<SidebarChat myUser={myUser} socket={socket} chats={chats} setCurrentChat={setCurrentChat} />
+			{currentChat._id !== '' && <ChatSection myUser={myUser} currentChat={currentChat} messages={messages} />}
 		</div>
 	);
 }

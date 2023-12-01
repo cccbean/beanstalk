@@ -22,8 +22,6 @@ const User = require('./models/user');
 const Chat = require('./models/chat');
 const Message = require('./models/message');
 
-const messages = [];
-
 const PORT = 3000;
 const app = express();
 const httpServer = createServer(app);
@@ -105,12 +103,18 @@ const io = new Server(httpServer, {
 });
 
 io.on('connection', (socket) => {
-  socket.on('get-chats', async (data) => {
-    console.log(data);
-    const chats = await Chat.find({users: data._id}).populate('users', '-password').exec();
-    console.log(chats);
-    socket.emit('get-chats', chats);
-  })
+	socket.on('get-chats', async (data) => {
+		const chats = await Chat.find({ users: data._id }).populate('users', '-password').exec();
+		socket.emit('get-chats', chats);
+	});
+
+	socket.on('get-messages', async (data) => {
+		const messages = await Message.find({ chat: data }).populate('user', '-password').exec();
+		console.log(messages);
+		// for whatever reason, this isn't working
+		// socket.emit('get-messages', messages);
+		io.emit('get-messages', messages);
+	});
 });
 
 httpServer.listen(PORT, () => console.log('server listening on http:localhost/3000'));

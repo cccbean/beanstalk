@@ -1,17 +1,20 @@
 import { User } from '../App';
 import ChatBubble from '../components/ChatBubble';
+import { Chat, Message } from '../pages/ChatPage';
 
 type Props = {
   myUser: User;
+  currentChat: Chat;
+  messages: Message[];
 }
 
-function ChatSection({myUser}: Props) {
+function ChatSection({myUser, currentChat, messages}: Props) {
 	return (
 		<div className="flex-1 h-full flex flex-col">
 			<div className="navbar justify-between border-b border-base-content">
 				<div>
-					<a className="btn btn-ghost" href="">
-						Monkey D. Luffy
+					<a className="btn btn-ghost">
+						{currentChat.name}
 					</a>
 				</div>
 
@@ -21,19 +24,13 @@ function ChatSection({myUser}: Props) {
 			</div>
 
 			<div className="flex-1 p-4">
-				<ChatBubble
-					username="Monkey D. Luffy"
-					message="I'm gonna be King of the Pirates!"
-					timestamp="14:09"
-					orientation="chat-start"
-				/>
-
-				<ChatBubble
-					username="Monkey D. Luffy"
-					message="No, me!"
-					timestamp="14:10"
-					orientation="chat-end"
-				/>
+        {messages.map((message) => {
+          if (message.user.username === myUser.username) {
+            return <ChatBubble key={message._id} username={message.user.username} message={message.message} timestamp={message.createdAt} orientation="chat-end"  />
+          } else {
+            return <ChatBubble key={message._id} username={message.user.username} message={message.message} timestamp={message.createdAt} orientation="chat-start"  />
+          }
+        })}
 			</div>
 
 			<form className="flex gap-4 p-4 border-t border-base-content">
