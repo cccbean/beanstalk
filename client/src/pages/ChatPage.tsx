@@ -26,23 +26,11 @@ function ChatPage({myUser}: Props) {
       setChats(data);
     } 
 
-		function onMessagesEvent(data: string[]) {
-			setMessages(data);
-		}
-
-		function onNewMessageEvent(data: string) {
-			setMessages((previous) => [...previous, data]);
-		}
-
     socket.emit('get-chats', myUser);
     socket.on('get-chats', onGetChatsEvent);
-		socket.on('messages', onMessagesEvent);
-		socket.on('new-message', onNewMessageEvent);
 
 		return () => {
       socket.off('get-chats', onGetChatsEvent);
-			socket.off('messages', onMessagesEvent);
-			socket.off('new-message', onNewMessageEvent);
 		};
 	}, []);
 

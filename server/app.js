@@ -22,25 +22,6 @@ const User = require('./models/user');
 const Chat = require('./models/chat');
 const Message = require('./models/message');
 
-// async function testChats() {
-// 	const rosa = await User.find({ username: 'rosa' }).exec();
-// 	const billy = await User.find({ username: 'billy' }).exec();
-// 	const fulano = await User.find({ username: 'fulano' }).exec();
-// 	const chat = new Chat({
-// 		name: 'rosa,billy',
-// 		users: [...rosa, ...billy],
-// 	});
-// 	const chat2 = new Chat({
-// 		name: 'rosa,fulano',
-// 		users: [...rosa, ...fulano],
-// 	});
-// 	console.log(chat);
-// 	console.log(chat2);
-//   await chat.save();
-//   await chat2.save();
-// }
-// // testChats();
-
 const messages = [];
 
 const PORT = 3000;
@@ -124,21 +105,12 @@ const io = new Server(httpServer, {
 });
 
 io.on('connection', (socket) => {
-  // socket.emit('messages', )
-	socket.emit('messages', messages);
-
   socket.on('get-chats', async (data) => {
     console.log(data);
     const chats = await Chat.find({users: data._id}).populate('users', '-password').exec();
     console.log(chats);
     socket.emit('get-chats', chats);
   })
-
-	socket.on('new-message', (data) => {
-		messages.push(data);
-		console.log(messages);
-		io.emit('new-message', data);
-	});
 });
 
 httpServer.listen(PORT, () => console.log('server listening on http:localhost/3000'));
