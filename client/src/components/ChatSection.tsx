@@ -1,17 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { User } from '../App';
 import ChatBubble from '../components/ChatBubble';
 import { Chat, Message } from '../pages/ChatPage';
-import { Socket } from 'socket.io-client';
+import { socket } from '../socket';
 
 type Props = {
   myUser: User;
-  socket: Socket;
   currentChat: Chat;
   messages: Message[];
 }
 
-function ChatSection({myUser, socket, currentChat, messages}: Props) {
+function ChatSection({myUser, currentChat, messages}: Props) {
   const [newMessage, setNewMessage] = useState('');
 
   const sendMessage:React.FormEventHandler<HTMLFormElement> = (e) => {

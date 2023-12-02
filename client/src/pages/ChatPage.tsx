@@ -4,6 +4,7 @@ import ChatSection from '../components/ChatSection';
 import Menu from '../components/Menu';
 import SidebarChat from '../components/SidebarChat';
 import { useEffect, useState } from 'react';
+import { socket } from '../socket';
 
 export type Chat = {
 	_id: string;
@@ -26,7 +27,6 @@ function ChatPage({ myUser }: Props) {
 	const [chats, setChats] = useState<Chat[]>([]);
 	const [currentChat, setCurrentChat] = useState<Chat>({ _id: '', name: '', users: [] });
 	const [messages, setMessages] = useState<Message[]>([]);
-	const socket = io('http://localhost:3000');
 
 	useEffect(() => {
 		function onGetChatsEvent(data: Chat[]) {
@@ -34,6 +34,7 @@ function ChatPage({ myUser }: Props) {
 		}
 
 		function onGetMessagesEvent(data: Message[]) {
+      console.log(data);
 			setMessages(data.reverse());
 		}
 
@@ -56,11 +57,10 @@ function ChatPage({ myUser }: Props) {
 	return (
 		<div className="h-screen flex overflow-hidden">
 			<Menu myUser={myUser} />
-			<SidebarChat myUser={myUser} socket={socket} chats={chats} setCurrentChat={setCurrentChat} />
+			<SidebarChat myUser={myUser} chats={chats} setCurrentChat={setCurrentChat} />
 			{currentChat._id !== '' && (
 				<ChatSection
 					myUser={myUser}
-					socket={socket}
 					currentChat={currentChat}
 					messages={messages}
 				/>

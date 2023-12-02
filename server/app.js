@@ -21,6 +21,7 @@ db.on('error', console.error.bind(console, 'mongo connection error'));
 const User = require('./models/user');
 const Chat = require('./models/chat');
 const Message = require('./models/message');
+const { Socket } = require('engine.io');
 
 const PORT = 3000;
 const app = express();
@@ -109,11 +110,14 @@ io.on('connection', (socket) => {
 	});
 
 	socket.on('get-messages', async (data) => {
+		socket.join('chat-room');
+		console.log(data);
+		console.log(socket.rooms);
 		const messages = await Message.find({ chat: data }).populate('user', '-password').sort({timestamp: 1}).exec();
-		console.log(messages);
 		// for whatever reason, this isn't working
-		// socket.emit('get-messages', messages);
-		io.emit('get-messages', messages);
+		socket.emit('get-messages', messages);
+		// io.in('chat-room').emit('get-messages', messages);
+		// io.to('chat-room').timeout(5000).emit('get-messages', (err) => err ? console.log(err) : console.log('no error'));
 	});
 
 	socket.on('send-message', async (data) => {

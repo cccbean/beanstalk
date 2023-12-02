@@ -1,16 +1,15 @@
-import { Socket } from 'socket.io-client';
 import { User } from '../App';
 import tempAvatar from '../assets/Luffy-pic.png';
 import { Chat } from '../pages/ChatPage';
+import { socket } from '../socket';
 
 type Props = {
 	myUser: User;
-  socket: Socket;
 	chats: Chat[];
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat>>;
 };
 
-function SidebarChat({ myUser, socket, chats, setCurrentChat }: Props) {
+function SidebarChat({ myUser, chats, setCurrentChat }: Props) {
 	return (
 		<div className="h-full border-r border-base-content flex flex-col w-80 gap-2">
 			<div className="flex items-center justify-between px-4 pt-4 pb-2">
