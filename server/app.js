@@ -110,14 +110,14 @@ io.on('connection', (socket) => {
 	});
 
 	socket.on('get-messages', async (data) => {
-		socket.join('chat-room');
-		console.log(data);
-		console.log(socket.rooms);
+		const socketRooms = socket.rooms;
+		const rooms = [...socketRooms];
+		if (rooms.length > 1) {
+			socket.leave(`${rooms[1]}`);
+		}
+		socket.join(`${data}`);
 		const messages = await Message.find({ chat: data }).populate('user', '-password').sort({timestamp: 1}).exec();
-		// for whatever reason, this isn't working
-		socket.emit('get-messages', messages);
-		// io.in('chat-room').emit('get-messages', messages);
-		// io.to('chat-room').timeout(5000).emit('get-messages', (err) => err ? console.log(err) : console.log('no error'));
+		io.to(`${data}`).emit('get-messages', messages);
 	});
 
 	socket.on('send-message', async (data) => {
@@ -128,7 +128,9 @@ io.on('connection', (socket) => {
 		})
 		const newMessage = await message.save();
 		const messageWithTimestamp = await Message.findById(newMessage._id).populate('user', '-password').exec();
-		io.emit('send-message', messageWithTimestamp);
+		const socketRooms = socket.rooms;
+		const rooms = [...socketRooms];
+		io.to(`${rooms[1]}`).emit('send-message', messageWithTimestamp);
 	})
 });
 
