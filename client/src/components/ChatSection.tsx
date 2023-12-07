@@ -42,13 +42,19 @@ function ChatSection({ myUser, currentChat, messages }: Props) {
 
 			<div className="flex-1 p-4 overflow-auto relative flex flex-col-reverse">
 				{messages.map((message) => {
+					const timestamp = new Date(message.createdAt);
 					if (message.user.username === myUser.username) {
 						return (
 							<ChatBubble
 								key={message._id}
 								username={message.user.username}
 								message={message.message}
-								timestamp={message.createdAt}
+								timestamp={`${
+									timestamp.getMonth() + 1
+								}/${timestamp.getDate()}/${timestamp.getFullYear()} ${timestamp.getHours()}:${timestamp
+									.getMinutes()
+									.toString()
+									.padStart(2, '0')}`}
 								orientation="chat-end"
 							/>
 						);
@@ -58,7 +64,12 @@ function ChatSection({ myUser, currentChat, messages }: Props) {
 								key={message._id}
 								username={message.user.username}
 								message={message.message}
-								timestamp={message.createdAt}
+								timestamp={`${
+									timestamp.getMonth() + 1
+								}/${timestamp.getDate()}/${timestamp.getFullYear()} ${timestamp.getHours()}:${timestamp
+									.getMinutes()
+									.toString()
+									.padStart(2, '0')}`}
 								orientation="chat-start"
 							/>
 						);

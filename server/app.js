@@ -153,7 +153,7 @@ io.on('connection', (socket) => {
 
 	socket.on('new-chat', async (data) => {
 		console.log(data);
-	})
+	});
 });
 
 httpServer.listen(PORT, () => console.log('server listening on http:localhost/3000'));
