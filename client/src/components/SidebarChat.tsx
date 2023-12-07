@@ -27,6 +27,7 @@ function SidebarChat({ myUser, chats, setCurrentChat }: Props) {
 
 			<ul className="menu menu-vertical p-0">
         {/* TODO: extract this out to its own component to handle click logic that opens the chat */}
+				{/* TODO: handle the case where searchResults returns an empty array */}
 				{searchResults.length > 0 
 				? searchResults.map((user) => {
 					return (
