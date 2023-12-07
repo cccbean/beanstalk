@@ -116,7 +116,10 @@ io.on('connection', (socket) => {
 			socket.leave(`${rooms[1]}`);
 		}
 		socket.join(`${data}`);
-		const messages = await Message.find({ chat: data }).populate('user', '-password').sort({timestamp: 1}).exec();
+		const messages = await Message.find({ chat: data })
+			.populate('user', '-password')
+			.sort({ timestamp: 1 })
+			.exec();
 		io.to(`${data}`).emit('get-messages', messages);
 	});
 
@@ -124,14 +127,29 @@ io.on('connection', (socket) => {
 		const message = new Message({
 			user: data.user._id,
 			chat: data.chat,
-			message: data.message
-		})
+			message: data.message,
+		});
 		const newMessage = await message.save();
-		const messageWithTimestamp = await Message.findById(newMessage._id).populate('user', '-password').exec();
+		const messageWithTimestamp = await Message.findById(newMessage._id)
+			.populate('user', '-password')
+			.exec();
 		const socketRooms = socket.rooms;
 		const rooms = [...socketRooms];
 		io.to(`${rooms[1]}`).emit('send-message', messageWithTimestamp);
-	})
+	});
+
+	socket.on('search', async (data) => {
+		const myId = data.myUser._id;
+		const regex = new RegExp(data.search, 'i');
+		const userSearch = await User.find({ username: regex })
+			.where('_id')
+			.ne(myId)
+			.select('-password')
+			.sort({ username: 1 })
+			.exec();
+		// TODO: error check
+		socket.emit('search', userSearch);
+	});
 });
 
 httpServer.listen(PORT, () => console.log('server listening on http:localhost/3000'));

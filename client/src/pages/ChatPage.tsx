@@ -1,4 +1,3 @@
-import { io } from 'socket.io-client';
 import { User } from '../App';
 import ChatSection from '../components/ChatSection';
 import Menu from '../components/Menu';

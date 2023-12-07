@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { User } from '../App';
 import tempAvatar from '../assets/Luffy-pic.png';
 import { Chat } from '../pages/ChatPage';
 import { socket } from '../socket';
+import Search from './Search';
 
 type Props = {
 	myUser: User;
@@ -10,6 +12,8 @@ type Props = {
 };
 
 function SidebarChat({ myUser, chats, setCurrentChat }: Props) {
+	const [searchResults, setSearchResults] = useState<User[]>([]);
+
 	return (
 		<div className="h-full border-r border-base-content flex flex-col w-80 gap-2">
 			<div className="flex items-center justify-between px-4 pt-4 pb-2">
@@ -18,17 +22,28 @@ function SidebarChat({ myUser, chats, setCurrentChat }: Props) {
 			</div>
 
 			<div className="flex justify-center px-2 pb-2">
-				<input
-					className="input input-bordered flex-1 rounded-full"
-					type="search"
-					id="search"
-					name="search"
-				/>
+				<Search myUser={myUser} setSearchResults={setSearchResults} />
 			</div>
 
 			<ul className="menu menu-vertical p-0">
         {/* TODO: extract this out to its own component to handle click logic that opens the chat */}
-				{chats.map((chat) => {
+				{searchResults.length > 0 
+				? searchResults.map((user) => {
+					return (
+						<li key={user._id}>
+							<a className="flex gap-4 rounded-none">
+								<div className="avatar">
+									<div className="w-12 rounded-full">
+										<img src={tempAvatar} alt="" />
+									</div>
+								</div>
+
+								<p>{user.username}</p>
+							</a>
+						</li>
+					);
+				})
+				: chats.map((chat) => {
           const [otherUser] = chat.users.filter((user) => user.username !== myUser.username);
 
 					return (
