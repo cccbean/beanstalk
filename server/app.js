@@ -150,6 +150,10 @@ io.on('connection', (socket) => {
 		// TODO: error check
 		socket.emit('search', userSearch);
 	});
+
+	socket.on('new-chat', async (data) => {
+		console.log(data);
+	})
 });
 
 httpServer.listen(PORT, () => console.log('server listening on http:localhost/3000'));

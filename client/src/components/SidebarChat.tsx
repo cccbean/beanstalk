@@ -4,6 +4,7 @@ import tempAvatar from '../assets/Luffy-pic.png';
 import { Chat } from '../pages/ChatPage';
 import { socket } from '../socket';
 import Search from './Search';
+import NewChatBtn from './NewChatBtn';
 
 type Props = {
 	myUser: User;
@@ -19,7 +20,7 @@ function SidebarChat({ myUser, chats, currentChat, setCurrentChat }: Props) {
 		<div className="h-full border-r border-base-content flex flex-col w-80 gap-2">
 			<div className="flex items-center justify-between px-4 pt-4 pb-2">
 				<h1 className="text-2xl">Chat</h1>
-				<button className="btn btn-sm">N</button>
+				<NewChatBtn myUser={myUser} />
 			</div>
 
 			<div className="flex justify-center px-2 pb-2">
