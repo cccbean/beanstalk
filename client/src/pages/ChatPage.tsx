@@ -56,7 +56,7 @@ function ChatPage({ myUser }: Props) {
 	return (
 		<div className="h-screen flex overflow-hidden">
 			<Menu myUser={myUser} />
-			<SidebarChat myUser={myUser} chats={chats} setCurrentChat={setCurrentChat} />
+			<SidebarChat myUser={myUser} chats={chats} currentChat={currentChat} setCurrentChat={setCurrentChat} />
 			{currentChat._id !== '' && (
 				<ChatSection
 					myUser={myUser}

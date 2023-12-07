@@ -8,10 +8,11 @@ import Search from './Search';
 type Props = {
 	myUser: User;
 	chats: Chat[];
-  setCurrentChat: React.Dispatch<React.SetStateAction<Chat>>;
+	currentChat: Chat;
+	setCurrentChat: React.Dispatch<React.SetStateAction<Chat>>;
 };
 
-function SidebarChat({ myUser, chats, setCurrentChat }: Props) {
+function SidebarChat({ myUser, chats, currentChat, setCurrentChat }: Props) {
 	const [searchResults, setSearchResults] = useState<User[]>([]);
 
 	return (
@@ -26,44 +27,48 @@ function SidebarChat({ myUser, chats, setCurrentChat }: Props) {
 			</div>
 
 			<ul className="menu menu-vertical p-0">
-        {/* TODO: extract this out to its own component to handle click logic that opens the chat */}
+				{/* TODO: extract this out to its own component to handle click logic that opens the chat */}
 				{/* TODO: handle the case where searchResults returns an empty array */}
-				{searchResults.length > 0 
-				? searchResults.map((user) => {
-					return (
-						<li key={user._id}>
-							<a className="flex gap-4 rounded-none">
-								<div className="avatar">
-									<div className="w-12 rounded-full">
-										<img src={tempAvatar} alt="" />
-									</div>
-								</div>
+				{searchResults.length > 0
+					? searchResults.map((user) => {
+							return (
+								<li key={user._id}>
+									<a className="flex gap-4 rounded-none">
+										<div className="avatar">
+											<div className="w-12 rounded-full">
+												<img src={tempAvatar} alt="" />
+											</div>
+										</div>
 
-								<p>{user.username}</p>
-							</a>
-						</li>
-					);
-				})
-				: chats.map((chat) => {
-          const [otherUser] = chat.users.filter((user) => user.username !== myUser.username);
+										<p>{user.username}</p>
+									</a>
+								</li>
+							);
+					  })
+					: chats.map((chat) => {
+							const [otherUser] = chat.users.filter((user) => user.username !== myUser.username);
 
-					return (
-						<li key={chat._id} onClick={() => {
-              socket.emit('get-messages', chat._id);
-              setCurrentChat(chat)
-              }}>
-							<a className="flex gap-4 rounded-none">
-								<div className="avatar">
-									<div className="w-12 rounded-full">
-										<img src={tempAvatar} alt="" />
-									</div>
-								</div>
+							return (
+								<li
+									className={currentChat._id === chat._id ? 'bg-base-300' : ''}
+									key={chat._id}
+									onClick={() => {
+										socket.emit('get-messages', chat._id);
+										setCurrentChat(chat);
+									}}
+								>
+									<a className="flex gap-4 rounded-none">
+										<div className="avatar">
+											<div className="w-12 rounded-full">
+												<img src={tempAvatar} alt="" />
+											</div>
+										</div>
 
-								<p>{otherUser.username}</p>
-							</a>
-						</li>
-					);
-				})}
+										<p>{otherUser.username}</p>
+									</a>
+								</li>
+							);
+					  })}
 			</ul>
 		</div>
 	);
